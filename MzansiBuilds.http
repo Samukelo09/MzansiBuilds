@@ -1,0 +1,6 @@
+@MzansiBuilds_HostAddress = http://localhost:5179
+
+GET {{MzansiBuilds_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
