@@ -10,4 +10,5 @@ public class Project
     public bool IsCompleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string OwnerUsername { get; set; } = string.Empty;
+    public string Milestones { get; set; } = string.Empty; // Store as a comma-separated list or JSON string
 }
