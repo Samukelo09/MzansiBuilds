@@ -13,6 +13,22 @@ public class ProjectsController : ControllerBase
     private readonly ApplicationDbContext _context;
     public ProjectsController(ApplicationDbContext context) => _context = context;
 
+    // New user
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] User user)
+    {
+        // Check if user already exists
+        if (await _context.Users.AnyAsync(u => u.Username == user.Username))
+        {
+            return BadRequest("Username already taken.");
+        }
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "User registered successfully! You can now login." });
+    }
+
     // GET: api/projects/feed -> Requirement 3: Live Feed
     [HttpGet("feed")]
     public async Task<IActionResult> GetFeed() =>
