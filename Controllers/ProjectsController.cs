@@ -46,4 +46,46 @@ public class ProjectsController : ControllerBase
         await _context.SaveChangesAsync();
         return Ok(new { message = "Collaboration request sent!" });
     }
+
+    // GET: api/projects/search?term=AI
+    [AllowAnonymous]
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProjects([FromQuery] string term)
+    {
+        var results = await _context.Projects
+            .Where(p => p.Title.Contains(term) || p.Description.Contains(term))
+            .ToListAsync();
+        return Ok(results);
+    }
+
+    // PUT: api/projects/{id}/complete
+    [Authorize]
+    [HttpPut("{id}/complete")]
+    public async Task<IActionResult> MarkAsComplete(int id)
+    {
+        var project = await _context.Projects.FindAsync(id);
+        if (project == null) return NotFound();
+
+        // Check if the person logged in owns this project
+        if (project.OwnerUsername != User.Identity?.Name) return Forbid();
+
+        project.IsCompleted = true;
+        project.Stage = "Live";
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Project moved to Celebration Wall!" });
+    }
+
+    // DELETE: api/projects/{id}
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProject(int id)
+    {
+        var project = await _context.Projects.FindAsync(id);
+        if (project == null) return NotFound();
+        if (project.OwnerUsername != User.Identity?.Name) return Forbid();
+
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Project deleted successfully" });
+    }
 }
